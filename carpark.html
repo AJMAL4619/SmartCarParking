@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>ParkingAssistant</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        .car {
+            background-color: #ececec;
+            height: 250px;
+        }
+        
+        .car.taken {
+            background-color: #d9534f;
+        }
+        
+        .car.free {
+            background-color: #5cb85c;
+        }
+        
+        .position {
+            text-align: center;
+            font-size: 36px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Brand</a>
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
+                        <li><a href="#">Link</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Action</a></li>
+                                <li><a href="#">Another action</a></li>
+                                <li><a href="#">Something else here</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="#">Separated link</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="#">One more separated link</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="#">Profile</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">App Settings</a></li>
+                                <li><a href="#">Profile Settings</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="#">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="row">
+            <p id="payload">Car Parking System</p>
+            <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                <div class="car" id="c1id">
+                    <div class="position">SLOT 1</div>
+                </div>
+            </div>
+            <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                <div class="car" id="c2id">
+                    <div class="position">SLOT 2</div>
+                </div>
+            </div>
+			</div>
+		<div class="col">	
+			<div class="row-xs-1 row-sm-1 row-md-1 row-lg-1"><color="black">
+                <div class="car" id="c3id">
+                    <div class="position"></div>
+
+                </div>
+            </div>
+			</div>
+		<div class="row">	
+            <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                <div class="car" id="c3id">
+                    <div class="position">SLOT 3</div>
+
+                </div>
+            </div>
+            <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                <div class="car" id="c4id">
+                    <div class="position">SLOT 4</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="js/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="js/bootstrap.min.js"></script>
+<script src="js/mqttws31.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/4.1.2/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAFxhtEysxoimAgIJw7MDhknh_3Ufik6VQ",
+    authDomain: "carparking-c5f84.firebaseapp.com",
+    databaseURL: "https://carparking-c5f84.firebaseio.com",
+    projectId: "carparking-c5f84",
+    storageBucket: "carparking-c5f84.appspot.com",
+    messagingSenderId: "593716014346"
+  };
+  firebase.initializeApp(config);
+</script>
+
+
+<script>
+    // Create a client instance: Broker, Port, Websocket Path, Client ID
+    client = new Paho.MQTT.Client("192.168.43.63", Number(9001), "/ws", "clientparking");
+
+    // set callback handlers
+    client.onConnectionLost = function (responseObject) {
+        console.log("Connection Lost: " + responseObject.errorMessage);
+    }
+
+    client.onMessageArrived = function (message) {
+        console.log("Message Arrived: " + message.payloadString);
+
+        var pload = message.payloadString;
+        var obj = jQuery.parseJSON(pload);
+        firebase.database().ref('/mydata').set({
+            slot_1: obj.c1,
+            slot_2: obj.c2,
+            slot_3: obj.c3,
+            slot_4: obj.c4
+        });
+
+        if (obj.c1 == 1) {
+            $("#c1id").addClass("free");
+            $("#c1id").removeClass("taken");
+        } else if (obj.c1 == 0) {
+            $("#c1id").addClass("taken");
+            $("#c1id").removeClass("free");
+
+        }
+        if (obj.c2 == 1) {
+            $("#c2id").addClass("free");
+            $("#c2id").removeClass("taken");
+        } else if (obj.c2 == 0) {
+            $("#c2id").addClass("taken");
+            $("#c2id").removeClass("free");
+
+        }
+        if (obj.c3 == 1) {
+            $("#c3id").addClass("free");
+            $("#c3id").removeClass("taken");
+        } else if (obj.c3 == 0) {
+            $("#c3id").addClass("taken");
+            $("#c3id").removeClass("free");
+
+        }
+        if (obj.c4 == 1) {
+            $("#c4id").addClass("free");
+            $("#c4id").removeClass("taken");
+        } else if (obj.c4 == 0) {
+            $("#c4id").addClass("taken");
+            $("#c4id").removeClass("free");
+
+        }
+
+    }
+
+    // Called when the connection is made
+    function onConnect() {
+        console.log("Connected!");
+        client.subscribe("mytopic");
+        message = new Paho.MQTT.Message("Hello");
+        message.destinationName = "/World";
+        client.send(message); 
+    }
+
+    // Connect the client, providing an onConnect callback
+    client.connect({
+        onSuccess: onConnect
+    });
+</script>
+
+
+</html> 
